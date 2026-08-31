@@ -1,0 +1,17 @@
+# Never copy these into the image — smaller, cleaner, and avoids leaking secrets.
+node_modules
+.next
+npm-debug.log*
+.git
+.gitignore
+.github
+.env
+.env.*
+!.env.example
+README.md
+terraform
+__tests__
+coverage
+Dockerfile
+.dockerignore
+docker-compose.yml

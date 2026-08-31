@@ -1,0 +1,7 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored so your
+# real connection string never lands in version control.
+project_name         = "infra-health"
+location             = "westus2"
+environment          = "dev"
+container_image      = "ghcr.io/OWNER/infra-health-dashboard:latest"
+db_connection_string = "postgres://user:password@your-db-host:5432/infra"

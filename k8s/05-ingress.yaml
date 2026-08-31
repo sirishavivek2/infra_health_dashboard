@@ -1,0 +1,24 @@
+# Optional: an Ingress routes a hostname to the web Service. Requires an ingress
+# controller in the cluster (e.g. `minikube addons enable ingress`, or the
+# NGINX ingress controller on Docker Desktop). If you're just using the
+# LoadBalancer Service in 04-app.yaml, you can skip applying this file.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web
+  namespace: infra-health
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: infra-health.local # add "127.0.0.1 infra-health.local" to your hosts file
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80

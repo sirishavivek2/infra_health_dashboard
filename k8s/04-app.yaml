@@ -1,0 +1,71 @@
+# The Next.js app: 2 replicas behind a Service. Kubernetes load-balances traffic
+# across the replicas, restarts any that crash, and (with the probes below) only
+# sends traffic to pods that are actually ready.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: infra-health
+  labels:
+    app: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          # Build locally first:  docker build -t infra-health-dashboard:local .
+          # (On Docker Desktop / minikube the local image is used directly.)
+          image: infra-health-dashboard:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DATABASE_URL
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: infra-health
+  labels:
+    app: web
+spec:
+  # LoadBalancer exposes the app on localhost when using Docker Desktop's
+  # built-in Kubernetes. On minikube use `minikube service web -n infra-health`,
+  # or on any cluster: kubectl port-forward -n infra-health svc/web 3000:80
+  type: LoadBalancer
+  selector:
+    app: web
+  ports:
+    - port: 80
+      targetPort: 3000

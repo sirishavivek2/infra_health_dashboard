@@ -1,0 +1,9 @@
+# A namespace keeps all the app's Kubernetes objects grouped together, so you
+# can inspect or delete the whole app with one label/namespace instead of
+# hunting for individual pieces.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: infra-health
+  labels:
+    app.kubernetes.io/part-of: infra-health-dashboard
